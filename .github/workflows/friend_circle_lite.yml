@@ -46,7 +46,9 @@ jobs:
     - name: Check RSS feeds
       env:
         SMTP_PWD: ${{ secrets.SMTP_PWD }}
+        FCL_REPO: ${{ github.repository }}
       run: |
+        echo "Checking RSS feeds..."
         python run.py
 
     - name: Upload last_articles.json as artifact
@@ -64,7 +66,7 @@ jobs:
     - name: Commit changes
       run: |
         mkdir pages
-        cp -r main ./static/index.html ./static/readme.md ./static/favicon.ico all.json errors.json pages/
+        cp -r main ./static/index.html ./static/readme.md ./static/favicon.ico ./static/bg-light.webp ./static/bg-dark.webp all.json errors.json pages/
         cd pages
         git init
         git add .

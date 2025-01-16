@@ -1,5 +1,6 @@
 from fastapi import FastAPI
-from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse, HTMLResponse, JSONResponse
 from starlette.middleware.cors import CORSMiddleware
 import json
 import random
@@ -9,6 +10,10 @@ from friend_circle_lite.get_conf import load_config
 
 app = FastAPI()
 
+# 设置静态文件目录
+app.mount("/static", StaticFiles(directory="static"), name="static")
+app.mount("/main", StaticFiles(directory="main"), name="main")
+
 # 添加 CORS 中间件
 app.add_middleware(
     CORSMiddleware,
@@ -17,17 +22,37 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+# 返回图标图片
+@app.get("/favicon.ico", response_class=HTMLResponse)
+async def favicon():
+    return FileResponse('static/favicon.ico')
+
+# 返回背景图片
+@app.get("/bg-light.webp", response_class=HTMLResponse)
+async def bg_light():
+    return FileResponse('static/bg-light.webp')
+    
+# 返回背景图片
+@app.get("/bg-dark.webp", response_class=HTMLResponse)
+async def bg_dark():
+    return FileResponse('static/bg-dark.webp')
+
+# 返回资源文件
+# 返回 CSS 文件
+@app.get("/fclite.css", response_class=HTMLResponse)
+async def get_fclite_css():
+    return FileResponse('./main/fclite.css')
+
+# 返回 JS 文件
+@app.get("/fclite.js", response_class=HTMLResponse)
+async def get_fclite_js():
+    return FileResponse('./main/fclite.js')
 
 @app.get("/", response_class=HTMLResponse)
 async def root():
-    try:
-        with open('./server/deploy-home.html', 'r', encoding='utf-8') as f:
-            html_content = f.read()
-        return HTMLResponse(content=html_content)
-    except FileNotFoundError:
-        return HTMLResponse(content="<h1>File not found</h1>", status_code=404)
+    return FileResponse('./static/index.html')
 
-@app.get('/all')
+@app.get('/all.json')
 async def get_all_articles():
     try:
         with open('./all.json', 'r', encoding='utf-8') as f:
@@ -38,7 +63,7 @@ async def get_all_articles():
     except json.JSONDecodeError:
         return JSONResponse(content={"error": "Failed to decode JSON"}, status_code=500)
 
-@app.get('/errors')
+@app.get('/errors.json')
 async def get_error_friends():
     try:
         with open('./errors.json', 'r', encoding='utf-8') as f:

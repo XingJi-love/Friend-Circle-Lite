@@ -1,3 +1,4 @@
+import logging
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
@@ -56,7 +57,7 @@ def email_sender(
             server.sendmail(sender_email, target_email, msg.as_string())
             print(f'邮件已发送到 {target_email}')
     except Exception as e:
-        print(f'无法发送邮件到 {target_email}. 错误: {e}')
+        logging.error(f'邮件发送失败，目标地址: {target_email}，错误信息: {e}')
 
 def send_emails(emails, sender_email, smtp_server, port, password, subject, body, template_path=None, template_data=None, use_tls=True):
     """
@@ -75,6 +76,5 @@ def send_emails(emails, sender_email, smtp_server, port, password, subject, body
     use_tls (bool): 是否使用 TLS 加密。默认为 True。
     """
     for email in emails:
-        print(f'正在发送邮件到 {email}')
-        print(f'---------------------------\n邮件主题: {subject}\n邮件内容: {body}\n发件人: {sender_email}\n---------------------------')
+        logging.info(f'正在发送邮件到 {email}，邮件内容: {subject}')
         email_sender(email, sender_email, smtp_server, port, password, subject, body, template_path, template_data, use_tls)
