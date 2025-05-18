@@ -1,9 +1,9 @@
 import logging
 from datetime import datetime, timedelta, timezone
 import re
-from typing import Any
 from urllib.parse import urljoin, urlparse
 from dateutil import parser
+from zoneinfo import ZoneInfo
 import requests
 import feedparser
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -26,9 +26,9 @@ HEADERS_XML = {
         "Chrome/123.0.0.0 Safari/537.36 "
         "(Friend-Circle-Lite/1.0; +https://github.com/willow-god/Friend-Circle-Lite)"
     ),
-    "Accept": "application/rss+xml, application/xml;q=0.9, */*;q=0.8",
+    "Accept": "application/atom+xml, application/rss+xml, application/xml;q=0.9, */*;q=0.8",
     "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
-    "Accept-Encoding": "gzip, deflate, br",
+    "Accept-Encoding": "gzip, deflate",
     "Connection": "keep-alive",
     "X-Friend-Circle": "1.0"
 }
@@ -325,7 +325,7 @@ def fetch_and_process_data(json_url, specific_RSS=[], count=5):
             'active_num': active_friends,
             'error_num': error_friends,
             'article_num': total_articles,
-            'last_updated_time': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            'last_updated_time': datetime.now(ZoneInfo("Asia/Shanghai")).strftime('%Y-%m-%d %H:%M:%S')
         },
         'article_data': article_data
     }
